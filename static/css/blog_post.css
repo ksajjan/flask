@@ -1,0 +1,16 @@
+h3.post_heading {
+	margin: 20px;
+}
+
+small.post_date{
+	margin: 20px;
+}
+div.single_blog_post {
+	padding: 10px 50px 10px 50px;
+	font-size: 40px;
+}
+
+p.post_description {
+	background-color: yellow;
+	font-size: 100px;
+}
