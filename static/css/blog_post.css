@@ -1,5 +1,5 @@
-h3.post_heading {
-	margin: 20px;
+h2.post_heading {
+	
 }
 
 small.post_date{
@@ -7,10 +7,18 @@ small.post_date{
 }
 div.single_blog_post {
 	padding: 10px 50px 10px 50px;
-	font-size: 40px;
+	
 }
 
 p.post_description {
 	background-color: yellow;
-	font-size: 100px;
+	
+}
+
+@media (device-width: 360px)  {
+
+img { 
+	max-width: 100%;
+	height: auto;
+ }
 }

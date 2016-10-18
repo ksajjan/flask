@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+	<title> A simple twitter user behaviour analysis (with code) - Sajjan's Blog </title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../static/img/github.png">
+
+  <link rel="stylesheet" href="../../static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../static/css/sticky-footer-navbar.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+  </script>
+  
+  
+ <link rel="stylesheet" type="text/css" href="../../static/css/blog_post.css ">
+
+
+
+
+</head>
+<body>
+<nav class="navbar navbar-default" style="margin: 0px "> 
+  <div class="container-fluid">
+
+    <ul class="nav navbar-nav" style="padding: 0px 0px 0px 30px">
+      <li class="active"><a href="#">About</a></li>
+      <li><a href="../index.html">Posts</a></li>
+      <li><a href="../../resume">Resume</a></li>
+    </ul>
+    
+    <ul class="nav navbar-nav navbar-right" style="padding: 0px 30px 0px 0px">
+      <li> <a href="https://github.com/ksajjan" target="_blank">
+      <img src="../../static/img/github.png" style="width: 30px; height=30px"> 
+      </a> </li>
+      <li> <a href="https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank">
+      <img src="../../static/img/LinkedIn.png" style="width: 30px; height=30px"> 
+      </a></li>
+      <li> <a href="https://twitter.com/sajjkum" target="_blank">
+      <img src="../../static/img/Twitter.png" style="width: 30px; height=30px"> 
+      </a></li>
+
+    </ul>
+
+  </div>
+</nav>
+
+
+	<div class="single_blog_post">
+		<h2 class="post_heading"> A simple twitter user behaviour analysis (with code)  </h2>
+		<p class="post_description">
+			<p>Oct-2 is also known for Gandhi Jayanti. Their will be lots of tweets on this occasion. I grabbed most of them and do some basic analysis . A single tweet data is looks like http://pastebin.com/dSW9vXvS which can be viewd ( prettify) with
+various json viewer. I grabed 38,149 tweets and stored into a json file. so lets start.</p>
+<p>I tracked for the following words(hashtags) <i>['#GandhiJayanti','Mahatma Gandhi','Lal Bahadur Shastri','#InternationalDayOfNonViolence','#fatherofthenation','#ShashtriJayanti'] </i></p>
+<p><strong><em>first import our important module ..</em></strong></p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">json</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="c1">#for plotting the data</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">style</span>
+<span class="kn">import</span> <span class="nn">matplotlib.dates</span> <span class="kn">as</span> <span class="nn">md</span>
+<span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;fivethirtyeight&quot;</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">14.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The data is in a json file. so let's read the data using the json module</p>
+<div class="codehilite"><pre><span></span>#getting data 
+with open(r&#39;D:\Devotion of time\Data\GandhiJayanti\data.json&#39;,&#39;r&#39;) as f:
+tweet_data = []
+for line in f:
+    if line.strip() != &#39;&#39;:
+    #using try except block for handling bad formatted data
+        try:
+            tweet_data.append(json.loads(line))
+        except ValueError:
+            pass
+</pre></div>
+
+
+<p>Just check how much we get <br></p>
+<div class="codehilite"><pre><span></span>len(tweet_data)
+</pre></div>
+
+
+<blockquote>
+<p>38149</p>
+</blockquote>
+<p>Here we got <strong>38149 tweets</strong>.<br></p>
+<p>Let's do some data cleaning. Extract the info we are going to use like source of twitter, other hashtag used with GandhiJayanti,<br>
+account created, time when tweeted etc. </p>
+<div class="codehilite"><pre><span></span>tweet_text=[]
+tweet_source=[]
+tweet_created_at=[]
+tweet_utc_offset=[]
+tweet_timezone=[]
+hashtag_used=[]
+user_mentioned=[]
+account_created=[]
+timestamp=[]
+for tweet in tweet_data:
+try:
+    tweet_text.append(tweet[&#39;text&#39;].encode(&#39;utf-8&#39;))
+except KeyError:
+    pass
+try:
+    tweet_source.append(tweet[&#39;source&#39;])
+except KeyError:
+    pass
+try:
+    tweet_created_at.append(tweet[&#39;created_at&#39;])
+except KeyError:
+    pass
+try:
+    timestamp.append(tweet[&#39;timestamp_ms&#39;])
+except KeyError:
+    pass
+try :                 
+    tweet_utc_offset.append(tweet[&#39;user&#39;][&#39;utc_offset&#39;])
+except KeyError:
+    pass
+try:
+    tweet_timezone.append(tweet[&#39;user&#39;][&#39;time_zone&#39;])
+except KeyError:
+    pass
+try:
+    account_created.append(tweet[&#39;user&#39;][&#39;created_at&#39;])
+except KeyError:
+    pass
+
+try: 
+    hashtag_used.append(tweet[&#39;entities&#39;][&#39;hashtags&#39;])
+except KeyError:
+    pass
+try: 
+    user_mentioned.append(tweet[&#39;entities&#39;][&#39;user_mentions&#39;])
+except KeyError:
+    pass
+</pre></div>
+
+
+<p>Let's check how much we lost during this process</p>
+<div class="codehilite"><pre><span></span>print len(tweet_text), len(tweet_source)
+print len(tweet_text[2])
+</pre></div>
+
+
+<blockquote>
+<p>38127 38127<br />
+229</p>
+</blockquote>
+<p><em>Note : Here Length of tweets[Text] is 229. Because it's language is in Hindi so keep that in mind.</em></p>
+<h4>Now let's define our function to create a graph.</h4>
+<div class="codehilite"><pre><span></span>def hashtag_trend(hashtag_used):
+&quot;&quot;&quot; 
+it takes a list of hashtag which is extracted earlier
+
+&quot;&quot;&quot;
+hashtag =[]  # created a empty list
+
+&quot;&quot;&quot; 
+cleaning up the data 
+like some tweets are not having any other hashtag so instead of skiping them just
+
+using the keyword None which means no other hashtag used
+&quot;&quot;&quot;
+
+for entries in hashtag_used:
+    if len(entries) == 0:
+        hashtag.append(&#39;None&#39;)
+    else:
+        for single_entry in entries:
+            hashtag.append(single_entry[&#39;text&#39;])
+
+most_used_hashtag = Counter(hashtag)  # setting up a counter 
+# making this a list instead of a Counter Object
+
+most_hashtag= most_used_hashtag.most_common()
+
+#Now plotting mostly used hashtag while tweeting on Gandhi Jayanti
+
+hashtag_used_with_counter=[]  # simply hashtag used    ( bad in naming variable :(  )
+hashtag_counter=[]            # cooresponding counter
+
+
+&quot;&quot;&quot; we will skip various format of GandhiJayanti like MahtmaGandhi, mahatma etc.. what we want to know what are other 
+hashtag used except hashtag around the MahatmaGandhi&quot;&quot;&quot;
+
+
+non_counter_list=[&#39;GandhiJayanti&#39;,&#39;MahatmaGandhi&#39;,&#39;Gandhi&#39;,&#39;mahatmagandhi&#39;,&#39;mahatma&#39;,&#39;HappyGandhiJayanti&#39;,&#39;gandhijayanti&#39;,
+                  &#39;gandhi&#39;,&#39;Gandhijayanti&#39;]
+for hashtag in most_hashtag:
+    if hashtag[0] in non_counter_list:
+        pass
+    else:
+        hashtag_used_with_counter.append(hashtag[0])
+        hashtag_counter.append(hashtag[1])
+
+fig, ax = plt.subplots(1,1, figsize=(10,7.5))
+
+x_size=[i for i in hashtag_counter[:20]]
+#print len(x_size)
+y_label=[]
+for i in hashtag_used_with_counter[:20]:
+    try:
+        y_label.append(str(i))
+    except UnicodeEncodeError:
+        y_label.append(&#39;some random unicode&#39;)
+
+#y_label= [str(i) for i in hashtag_used_with_counter[:20]]
+#print len(y_label)
+
+y_pos = np.arange(len(y_label))
+
+plt.barh(y_pos, x_size, align=&#39;center&#39;, alpha=0.8)
+plt.yticks(y_pos, y_label)
+plt.xlabel(&#39;No of time #tag used &#39;)
+plt.ylabel(&#39;Hashtag used&#39;)
+plt.title(&#39;No of time other hashtag used while tweeting about Gandhi Jaynti&#39;)
+plt.show()
+</pre></div>
+
+
+<h4>Let's figure out  which twitter client is used for tweeting (dealing with source )</h4>
+<div class="codehilite"><pre><span></span>#Here we define a function client_var() which takes as input list of source
+
+def client_var(tweet_source):
+    #defining our variable 
+    android=0
+    web=0
+    ipad=0
+    iphone=0
+    mobile_web=0
+    face_insta_twitter=0
+    windows=0
+    others=0
+
+    #iterating through our tweet_source and whatever source we find we will increament respective variable.
+
+    for source in tweet_source:
+        if &quot;Android&quot; in source:
+            android= android +1
+
+        elif &quot;Web Client&quot; in source:
+            web= web +1
+
+        elif &quot;iPad&quot; in source:
+            ipad= ipad +1
+
+        elif &quot;iPhone&quot; in source:
+            iphone = iphone + 1
+
+        elif &quot;Mobile Web&quot; in source:
+            mobile_web= mobile_web+1
+
+        elif &quot;Facebook&quot; in source or &quot;Instagram&quot; in source:
+            face_insta_twitter = face_insta_twitter + 1
+
+        elif &quot;Windows&quot; in source :
+            windows = windows + 1
+
+        else:
+            others = others + 1
+
+
+# Plotting a pie chart for above
+
+    labels=[&#39;Android&#39;,&#39;Web&#39;,&#39;iPhone&#39;,&#39;Windows Phone&#39;,&#39;Mobile Web&#39;,&#39;iPad&#39;,&#39;Social&#39;,&#39;Others&#39;]
+
+    label_size=[android, web,iphone,windows,mobile_web,ipad,face_insta_twitter,others]
+
+    colors= [&#39;#d62728&#39;, &#39;#ff9896&#39;, &#39;#9467bd&#39;, &#39;#c5b0d5&#39;,&#39;#8c564b&#39;, 
+        &#39;#c49c94&#39;, &#39;#e377c2&#39;, &#39;#f7b6d2&#39;]
+
+# Deciding which will explode in our graph
+
+    explode= []
+    for i in label_size:
+        if i &gt; (sum(label_size)) /8 :
+            explode.append(0.1)
+        else:
+            explode.append(0.0)
+
+    percent=[]
+#finding the percentage of that tweet
+
+    for i in label_size:
+        perc= 100.0 * i / sum(label_size)
+        percent.append(perc)
+
+#how we want to show our label
+
+    labels = [&#39;{0} - {1:1.2f} %&#39;.format(i,j) for i,j in zip(labels, percent)]
+
+    plt.pie(label_size,labels=labels, explode=explode,colors=colors, shadow=True, startangle=90)
+    plt.title(&quot;What twitter client is being used while tweeting&quot;)
+    plt.show()
+</pre></div>
+
+
+<h4>Checking In which year the user account is created.</h4>
+<div class="codehilite"><pre><span></span>def user_account_creation(account_creation_year):
+
+&quot;&quot;&quot;this function take a list which inclue the data about the time and year the user&#39;account is 
+created. 
+But we&#39;ll extract the year then procced
+
+&quot;&quot;&quot;
+    account_creation_year=[]
+    for account_time in account_created:
+
+        account_creation_year.append(int(account_time[-4:]))
+        #account type is like &quot;Sun oct 02 2016 12:43 2016&quot; so we will only exract last 4 letter and convert them into 
+        #integer
+
+    year_counter= Counter(account_creation_year).most_common()   
+    # so instead of a counter , year_counter will be a list (with .most_common() method) which will be easy to work with
+
+    year=[]
+    count=[]
+    for year_count in year_counter:
+        year.append(year_count[0])
+        count.append(year_count[1])
+
+    colors = np.random.rand(len(year))
+    area = np.pi * (15 * np.random.rand(len(year)))**2
+
+    plt.scatter(year,count,s=area, c=colors,alpha=0.6)
+    plt.xlabel(&quot;No of User account created In Year&quot;)
+    plt.ylabel(&quot;No of Tweets&quot;)
+    plt.title(&#39;No of tweets vs account creation year&#39;)
+    plt.show()
+    #By this scatter graph we can say that mostly tweet are
+    #coming from account that are &lt;b&gt; created in 2016 &lt;/b&gt; . and the 2007 is the earliest year which gone listed.
+</pre></div>
+
+
+<h4>Checking for most active time of user</h4>
+<div class="codehilite"><pre><span></span>def tweeting_time(tweet_created_at):
+
+&quot;&quot;&quot;this we will check at which time the user is most active. My script which grabbing the tweets broked many times
+so my this reasult will some basied.
+(like there will be no tweet between 2PM to 4PM as the script breaked so just check that out )
+
+
+&quot;&quot;&quot;
+
+    tweet_creation_datetime=[]
+
+    for every_time in tweet_created_at:
+
+        every_time= every_time[:16] + every_time[25:] #shuffling of data 
+        #just grabbing the what we need
+
+        tweet_creation_datetime.append(datetime.strptime(every_time,&#39;%a %b %d %H:%M %Y&#39;))
+
+    &quot;&quot;&quot;bins=[]
+    for i in range(6,16,1):
+        d= datetime(2016,10,2,i)
+        bins.append(d)
+        #This I used to make bins more clear but didn&#39;t work(try again)
+    &quot;&quot;&quot;
+    plt.hist(tweet_creation_datetime,bins=15, facecolor=&#39;blue&#39;,alpha=0.8)
+    plt.xticks(rotation=25 )
+    ax=plt.gca()
+    xfmt = md.DateFormatter(&#39; %H:%M&#39;)
+    ax.xaxis.set_major_formatter(xfmt)
+    ax.xaxis_date()
+    ax.autoscale_view()
+    plt.xlabel(&#39;Time&#39;)
+    plt.ylabel(&#39;No. of tweets &#39;)
+    plt.title(&quot;Time of Tweet vs no of tweets &quot;)
+
+    plt.show()
+</pre></div>
+
+
+<h3>Lets call our functions and see what result we got</h3>
+<div class="codehilite"><pre><span></span>hashtag_trend(hashtag_used)
+</pre></div>
+
+
+<p><img alt="hash-tag-graph" src="../../static/img/output_13_0.png" /></p>
+<h4>Analysing the graph</h4>
+<ol>
+<li>Most of time when someone tweet about "Gandhi Jayanti" No other hashtag is used</li>
+<li>after that <b> "FreeKashmir" </b> is most used with "Gandhi Jayanti"</li>
+<li><b> NonVoilence, Swacch Bhart , Team India, Paris Agreement and International Day of Non Violence </b> are also on the top list</li>
+<li>2 oct is also know for <b>LalBahadur Shastri Jayanti </b> and it also sometime occurred while tweeting about "Gandhi Jayanti" <b>[Some people remember also our late prime minister] </b><div class="codehilite"><pre><span></span>client_var(tweet_source)
+</pre></div>
+
+
+</li>
+</ol>
+<p><img alt="client source pie chart" src="../../static/img/output_15_0.png" /></p>
+<h4>Analysing the graph</h4>
+<p><b> From Pie Chart</b> -  <em>half of tweet</em> is done using an Android phone.<br>
+after that IPhone user are on the list.<br>
+<b>Others </b> include various automated service like Hootsuite , buffer, twitter deck etc</p>
+<div class="codehilite"><pre><span></span>user_account_creation(account_created)
+</pre></div>
+
+
+<p><img alt="account_creation_graph" src="../../static/img/output_17_0.png" /></p>
+<h4>Analysing the graph</h4>
+<p>By above scatter graph we can say that mostly tweet are coming from account that are <b> created in 2016(new user huh) </b>
+.and the 2007 and 2006 is the earliest year which gone listed.<br>
+so <b> recently created account are most active</b></p>
+<div class="codehilite"><pre><span></span>Twitter activity is directly realated to how long you have been on twitter.
+</pre></div>
+
+
+<p><code>tweeting_time(tweet_created_at)</code></p>
+<p><img alt="tweet time" src="../../static/img/output_19_0.png" /></p>
+<h4>Analysing the graph</h4>
+<p>Majority of tweets are from <b> 2PM to 4PM </b> , other major share would be time span from <b>6AM to 7AM, and 10:30AM to 12PM.</b></p>
+<h4>How Many word had been used</h4>
+<div class="codehilite"><pre><span></span>def text_len(tweet_text):
+&quot;&quot;&quot;
+Checking How much text are user using while tweeting 
+&quot;&quot;&quot;
+    length_tweets=[]
+    for text in tweet_text:
+        length_tweets.append(len(text))
+
+    plt.hist(length_tweets, bins=[0,50,100,150,200,250,300,350], facecolor=&#39;green&#39;, alpha=0.8)
+    plt.xlabel(&quot;Length of Tweets&quot;)
+    plt.ylabel(&#39;No of Tweets&#39;)
+    plt.title(&#39;Len(Tweets) Vs Count(Tweets)&#39;)
+    plt.show()
+
+#let&#39;s call our function
+text_len(tweet_text)
+</pre></div>
+
+
+<p><img alt="tweet_length_graph" src="../../static/img/output_22_0.png" /></p>
+<h3>2 word on Above graph</h3>
+<p></b>
+1. Their were Tweets in Hindi which causing length of tweets to be more than 140 </br>
+2. While Majority of user tweeted, their length of tweet lie in range 100 to 150. <br> 
+<br></p>
+		</p>
+		<small class="post_date">2016-10-04</small>
+	</div>
+
+
+
+<footer class="footer">
+      <div class="container">
+        <p class="text-muted"> </p>
+        Let's Talk
+        Connect on <a href="https://twitter.com/sajjkum" target="_blank">Twitter</a> , <a href=""https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank"">LinkedIn </a>, or <a href="mailto:sajjankumar@gmail.com" target="_blank">email me </a>.
+        
+      </div>
+</footer>
+
+</body>
+</html>
