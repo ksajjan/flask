@@ -7,11 +7,12 @@ small.post_date{
 }
 div.single_blog_post {
 	padding: 10px 50px 10px 50px;
+	margin:10px 50px 10px 50px;
 	
 }
 
 p.post_description {
-	background-color: yellow;
+	padding: 10px 50px 10px 50px;
 	
 }
 
