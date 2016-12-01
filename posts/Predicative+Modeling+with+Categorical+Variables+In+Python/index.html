@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+	<title> Predicative Modeling with Categorical Variables in Python - Sajjan's Blog </title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../static/img/sajjan.jpg">
+
+  <link rel="stylesheet" href="../../static/css/main.css">
+  <link rel="stylesheet" href="../../static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../static/css/sticky-footer-navbar.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+  </script>
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-86150938-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+  
+  
+ <link rel="stylesheet" type="text/css" href="../../static/css/blog_post.css ">
+
+
+
+
+</head>
+<body>
+<nav class="navbar navbar-default" style="margin: 0px "> 
+  <div class="container-fluid">
+
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse"
+      data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html"> Posts </a>
+  </div>
+  <div class="collapse navbar-collapse" id="myNavbar"> 
+    <ul class="nav navbar-nav">
+
+      <li><a href="../../resume">Resume</a></li>
+      <li><a href="#">About</a></li>
+      
+    </ul>
+    
+    <ul class="nav navbar-nav navbar-right">
+      <li> <a href="https://github.com/ksajjan" target="_blank">
+      <img src="../../static/img/github.png" style="width: 30px; height=30px"> 
+      </a> </li>
+      <li> <a href="https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank">
+      <img src="../../static/img/LinkedIn.png" style="width: 30px; height=30px"> 
+      </a></li>
+      <li> <a href="https://twitter.com/sajjkum" target="_blank">
+      <img src="../../static/img/Twitter.png" style="width: 30px; height=30px"> 
+      </a></li>
+
+    </ul>
+  </div>
+  </div>
+</nav>
+
+
+
+	<div class="single_blog_post">
+		<h2 class="post_heading"> Predicative Modeling with Categorical Variables in Python  </h2>
+		<p class="post_description">
+			<p>Sometime data-set contains both continuous and categorical variables. Usually we skip the categorical variables but in some cases categorical variable contains information that we don't want to skip. In that cases we have to prepare our model for categorical data as we can't fit categorical variable into regression/classification equation in there row form. They must be treated. Also Most ML algorithm gives best result with numeric data. </p>
+<p>Recently I was making a predictive model. That's works fine on continuous data but that can't be used for categorical data. To deal with categorical data either you have to change the data into numeric or switch to another model. Now I have a situation that how can I change my categorical data into numeric values using Python, To solve this let's get started.</p>
+<h4>What is categorical variable/data?</h4>
+<p>In a data-set the value for particular column/variable is not represented by some numeric value. Instead it is represented by some string value. These string value create different levels for that variable.</p>
+<p>Ex.</p>
+<ol>
+<li>In a dataset variable 'sex' have two levels which is represented by string 'male' and 'female'.</li>
+<li>In a data-set, variable country is a categorical variable and it can have different number of value so the Level formed by this variable depends on the different value country. </li>
+</ol>
+<p>Now moving to our programming part!
+The data-set is Titanic data-set.</p>
+<p>Lets First import our modules</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</pre></div>
+
+
+<p>load our data</p>
+<div class="codehilite"><pre><span></span>data= pd.read_csv(r&#39;E:\python\data\titanic.csv&#39;)
+</pre></div>
+
+
+<p>Let's take a look on our data</p>
+<div class="codehilite"><pre><span></span>data.head()
+</pre></div>
+
+
+<p>Output:</p>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.2500</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>1</td>
+      <td>3</td>
+      <td>Heikkinen, Miss. Laina</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>STON/O2. 3101282</td>
+      <td>7.9250</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Futrelle, Mrs. Jacques Heath (Lily May Peel)</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>113803</td>
+      <td>53.1000</td>
+      <td>C123</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Allen, Mr. William Henry</td>
+      <td>male</td>
+      <td>35.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>373450</td>
+      <td>8.0500</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Method First - By Inspection:</h2>
+<p>Sometime by using a small python script, we can convert our categorical or non-leveled data into a more sophisticated data so that our classification model can give best result. Let's Check...</p>
+<p>This data range from age 0.8 to age 80. So what we can do we can divide this in 5 Levels where each level represents 
+an age group ranging from 0 to 15.
+if there is an 'NaN' value,  I am going to replace by putting that into a level between range age 30 to age 45.</p>
+<div class="codehilite"><pre><span></span>age= data[&#39;Age&#39;]
+age_processed=[]
+
+
+for i in age:
+    if i &lt; 15.0:
+        age_processed.append(int(1))
+    elif i &gt;= 15.0 or i &lt; 30.0:
+        age_processed.append(int(2))
+    elif i &gt;= 30.0 or i &lt; 45.0:
+        age_processed.append(int(3))
+    elif i &gt;= 45.0 or i&lt; 60.0:
+        age_processed.append(int(4))
+    elif i &gt;= 60.0:
+        age_processed.append(int(5))
+    else:
+        age_processed.append(int(2))
+</pre></div>
+
+
+<p>Now by using a simple python script, our data has been transformed into a 5-leveled value.</p>
+<h2>Method Second : Using Python's Sklearn LabelEncoder</h2>
+<p>Python's sklearn provide a method to deal with categorical data using label encoding. This method is used to per-process data before applying to any model.</p>
+<div class="codehilite"><pre><span></span>new_data= pd.DataFrame()
+</pre></div>
+
+
+<p>first import our library</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span>
+</pre></div>
+
+
+<p>Now define our label encoder</p>
+<div class="codehilite"><pre><span></span>le= preprocessing.LabelEncoder()
+</pre></div>
+
+
+<p>Now tell our encoder that how much types of label we have.
+let's our categorical variable(Country) have below values</p>
+<div class="codehilite"><pre><span></span>le.fit([&#39;India&#39;,&#39;China&#39;,&#39;USA&#39;,&#39;UK&#39;,&#39;Bangladesh&#39;,&#39;Japan&#39;, &#39;Spain&#39;])
+</pre></div>
+
+
+<p>The data has been fitted to model. So Check how many classes are defined.</p>
+<div class="codehilite"><pre><span></span>le.classes_
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([&#39;Bangladesh&#39;, &#39;China&#39;, &#39;India&#39;, &#39;Japan&#39;, &#39;Spain&#39;, &#39;UK&#39;, &#39;USA&#39;], 
+      dtype=&#39;|S10&#39;)
+</pre></div>
+
+
+<p>Now let's transform some data from categorical to numeric values.</p>
+<div class="codehilite"><pre><span></span>Country=[&#39;India&#39;,&#39;China&#39;,&#39;USA&#39;,&#39;India&#39;,&#39;China&#39;,&#39;USA&#39;,&#39;UK&#39;,&#39;Bangladesh&#39;,&#39;Japan&#39;, &#39;Spain&#39;,&#39;UK&#39;,&#39;Bangladesh&#39;,
+     &#39;India&#39;,&#39;China&#39;,&#39;India&#39;,&#39;China&#39;,&#39;USA&#39;,&#39;UK&#39;,&#39;Bangladesh&#39;,&#39;Japan&#39;, &#39;Spain&#39;,&#39;USA&#39;,
+     &#39;UK&#39;,&#39;Bangladesh&#39;,&#39;Japan&#39;, &#39;Spain&#39;,&#39;Japan&#39;, &#39;Spain&#39;,]
+
+country_nuemeric= le.transform(Country)
+</pre></div>
+
+
+<p>Transformation has been done. Now check how the array country_numeric look a like.</p>
+<div class="codehilite"><pre><span></span>country_nuemeric
+</pre></div>
+
+
+<p>Output :</p>
+<div class="codehilite"><pre><span></span>array([2, 1, 6, 2, 1, 6, 5, 0, 3, 4, 5, 0, 2, 1, 2, 1, 6, 5, 0, 3, 4, 6, 5,
+       0, 3, 4, 3, 4])
+</pre></div>
+
+
+<p>Our data has been transformed and each integer value represent corresponding to le.classes_ output.  </p>
+<h2>Method Third : Using dummy coding</h2>
+<p>Python's data manipulation library Pandas also provides a method to deal with categorical data. </p>
+<div class="codehilite"><pre><span></span>new_df= pd.get_dummies(data[&#39;Embarked&#39;])
+</pre></div>
+
+
+<p>Data has been transformed into new variables.  </p>
+<div class="codehilite"><pre><span></span>new_df.head()
+</pre></div>
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>C</th>
+      <th>Q</th>
+      <th>S</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Here Embarked variable has three values (Level) 'C', 'Q', and 'S'. Pandas's get_dummies create three new variable in the data-frame and assign the value accordingly. for a single row only one column will have active value(1).</p>
+<p>So if the value for categorical variable have limited variation then it can be helpful.Now the new data can be joined with existing data or treated separately.</p>
+<h2>Final Thought:-</h2>
+<p>It would be difficult to tell you about the best method fit for you. you have to check that for yourself.
+Got anything about this post, Hit email me!</p>
+		</p>
+		<small class="post_date">Published On : 2016-12-01</small>
+	</div>
+
+
+
+
+<footer class="footer">
+      <div class="container">
+        <p class="text-muted"> </p>
+        Let's Talk!
+        Connect on <a href="https://twitter.com/sajjkum" target="_blank">Twitter</a> , <a href=""https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank"">LinkedIn </a>, or <a href="mailto:sajjankumar@gmail.com" target="_blank">email me </a>.
+        
+      </div>
+</footer>
+
+</body>
+</html>
