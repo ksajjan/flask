@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+	<title> Dealing With Missing Values Using Sklearn and Pandas - Sajjan's Blog </title>
+	<meta name="description" content="Real world data sets contain missing values. These values encoded as blanks, NaNs or other placeholders. Below methods can be used to fill out the missing values">
+	<meta name="keywords" content="Pandas fillna, filling missing value, deal with missing value python, sklearn Imputer function, handling missing value, imputation of missing values">
+	<meta name="author" content="Sajjan Kumar" >
+	
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../static/img/sajjan.jpg">
+
+  <link rel="stylesheet" href="../../static/css/main.css">
+  <link rel="stylesheet" href="../../static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../static/css/sticky-footer-navbar.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+  </script>
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-86150938-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+  
+  
+ <link rel="stylesheet" type="text/css" href="../../static/css/blog_post.css ">
+
+
+
+
+</head>
+<body>
+<nav class="navbar navbar-default" style="margin: 0px "> 
+  <div class="container-fluid">
+
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse"
+      data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html"> Posts </a>
+  </div>
+  <div class="collapse navbar-collapse" id="myNavbar"> 
+    <ul class="nav navbar-nav">
+
+      <li><a href="../../resume">Resume</a></li>
+      <li><a href="#">About</a></li>
+      
+    </ul>
+    
+    <ul class="nav navbar-nav navbar-right">
+      <li> <a href="https://github.com/ksajjan" target="_blank">
+      <img src="../../static/img/github.png" style="width: 30px; height=30px"> 
+      </a> </li>
+      <li> <a href="https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank">
+      <img src="../../static/img/LinkedIn.png" style="width: 30px; height=30px"> 
+      </a></li>
+      <li> <a href="https://twitter.com/sajjkum" target="_blank">
+      <img src="../../static/img/Twitter.png" style="width: 30px; height=30px"> 
+      </a></li>
+
+    </ul>
+  </div>
+  </div>
+</nav>
+
+
+
+	<div class="single_blog_post">
+		<h2 class="post_heading"> Dealing With Missing Values Using Sklearn and Pandas  </h2>
+		<p class="post_description">
+			<p>Real world data sets contain missing values. These values encoded as blanks, NaNs or other placeholders. we are used to skip that entire row/columns containing missing value while describing a machine learning model. However this comes at the price of losing data. </p>
+<p>A good strategy is to fill out the missing values using known part of the data. The Imputer class provides basic strategies for imputing missing values, either using the mean, the median or the most frequent value of the row or column in which the missing values are located. Let's Check</p>
+<p>first import our module and grab our data </p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">data</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">r&#39;titanic.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Let's Grab some column data which has some missing values. Have a look.</p>
+<div class="codehilite"><pre><span></span>data[&#39;Age&#39;].values[1:30]
+</pre></div>
+
+
+<p>Output :</p>
+<div class="codehilite"><pre><span></span>array([ 38.,  26.,  35.,  35.,  nan,  54.,   2.,  27.,  14.,   4.,  58.,
+        20.,  39.,  14.,  55.,   2.,  nan,  31.,  nan,  35.,  34.,  15.,
+        28.,   8.,  38.,  nan,  19.,  nan,  nan])
+</pre></div>
+
+
+<p>Here one can see missing values are represented as 'nan' (nan in Numpy array and NaN in pandas dataframe).Below are some method by which missing value can be handled.</p>
+<ol>
+<li>
+<p>Using sklearn.preprocessing Imputer function</p>
+</li>
+<li>
+<p>Using Pandas fillna() method</p>
+</li>
+</ol>
+<h2>1. Using Sklearn Imputer Function</h2>
+<p>import imputer class from sklearn.preprocessing</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span>
+</pre></div>
+
+
+<p>define our imputer. here we will describe missing_value placeholder, strategy used to fill out the value and axis.</p>
+<div class="codehilite"><pre><span></span>imp = Imputer(missing_values=&#39;NaN&#39;, strategy=&#39;mean&#39;, axis=0)
+</pre></div>
+
+
+<p>check out the imputer</p>
+<div class="codehilite"><pre><span></span>print imp
+</pre></div>
+
+
+<p>Output </p>
+<div class="codehilite"><pre><span></span>Imputer(axis=0, copy=True, missing_values=&#39;NaN&#39;, strategy=&#39;mean&#39;, verbose=0)
+</pre></div>
+
+
+<p>Here some additional variables axis, verbose are set to default.
+Now let's fit our data to our Imputer.</p>
+<div class="codehilite"><pre><span></span>imp.fit(data[&#39;Age&#39;].values.reshape(-1,1))
+</pre></div>
+
+
+<p>Output</p>
+<div class="codehilite"><pre><span></span>Imputer(axis=0, copy=True, missing_values=&#39;NaN&#39;, strategy=&#39;mean&#39;, verbose=0)
+</pre></div>
+
+
+<p>Now transform our data replacing Nan with appropriate mean value.</p>
+<div class="codehilite"><pre><span></span>age_reformed= imp.transform(data[&#39;Age&#39;].values.reshape(-1,1))
+</pre></div>
+
+
+<p>Now Check the transformed data.</p>
+<div class="codehilite"><pre><span></span>age_reformed[1:10]
+</pre></div>
+
+
+<p>Output</p>
+<div class="codehilite"><pre><span></span>array([[ 38.        ],
+       [ 26.        ],
+       [ 35.        ],
+       [ 35.        ],
+       [ 29.69911765],
+       [ 54.        ],
+       [  2.        ],
+       [ 27.        ],
+       [ 14.        ]])
+</pre></div>
+
+
+<p>Now these "nan" values has been transformed into mean value(29.69911765). The data after transformation can be used to machine learning model
+as it doesn't have missing value.</p>
+<h2>2. Using Pandas fillna()</h2>
+<p>Python's pandas library provide a direct way to deal with missing value. </p>
+<p>First create a new data frame with column value as age.</p>
+<div class="codehilite"><pre><span></span>df= pd.DataFrame(columns=[&#39;age&#39;])
+df[&#39;age&#39;]= data[&#39;Age&#39;].values
+</pre></div>
+
+
+<p>We have missing values in newly created Dataframe.</p>
+<div class="codehilite"><pre><span></span>df.head(10)
+</pre></div>
+
+
+<p>Output</p>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>22.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>38.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>35.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>35.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>54.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>27.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>14.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Pandas fillna method is applied to dataframe as</p>
+<div class="codehilite"><pre><span></span>DataFrame.fillna(value=None, method=None, axis=None, inplace=False, limit=None, downcast=None, **kwargs)
+</pre></div>
+
+
+<p>Now apply this to our data and put a value equal to 25 where nan occurs.</p>
+<div class="codehilite"><pre><span></span>filled_value=df.fillna(25)
+</pre></div>
+
+
+<p>Check the filled value</p>
+<div class="codehilite"><pre><span></span>fill_value.head(10)
+</pre></div>
+
+
+<p>Output:</p>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>22.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>38.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>35.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>35.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>25.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>54.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>27.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>14.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Here value in 6th row(5th indexed) has been changed from 'NaN' to 25.0.
+More information about the default variable can be checked from docs.</p>
+<p>Pandas's DataFrame fillan:-</p>
+<p><a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.fillna.html">http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.fillna.html</a></p>
+<p>Pandas's Series fillna:-</p>
+<p><a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.fillna.html">http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.fillna.html</a></p>
+<p>Got something about this post, Hit Email me.</p>
+		</p>
+		<small class="post_date">Published On : 2016-12-02</small>
+	</div>
+
+
+
+
+<footer class="footer">
+      <div class="container">
+        <p class="text-muted"> </p>
+        Let's Talk!
+        Connect on <a href="https://twitter.com/sajjkum" target="_blank">Twitter</a> , <a href=""https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank"">LinkedIn </a>, or <a href="mailto:sajjankumar@gmail.com" target="_blank">Email me </a>.
+        
+      </div>
+</footer>
+
+</body>
+</html>
