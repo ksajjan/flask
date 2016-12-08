@@ -9,7 +9,7 @@ body {
   margin-bottom: 60px;
 }
 .footer {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
@@ -24,6 +24,7 @@ body {
 
 body > .container {
   padding: 60px 15px 0;
+  margin-bottom: 80px;
 }
 .container .text-muted {
   margin: 20px 0;
