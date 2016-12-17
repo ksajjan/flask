@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+	<title> Advance NumPy Part-II - Sajjan's Blog </title>
+	<meta name="description" content="NumPy stands for Numerical Python which provides a vast type of methods to deal with data. Some advance method used in Numpy are..">
+	<meta name="keywords" content="Advance NumPy, NumPy universal funcation, ufunc, custom ufunc in python, Sorting, advance sorting python, argsort(),reduceat(),outer(),accumulate(),reduce(), Broadcasting Rule">
+	<meta name="author" content="Sajjan Kumar" >
+	
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../static/img/sajjan.jpg">
+
+  <link rel="stylesheet" href="../../static/css/main.css">
+  <link rel="stylesheet" href="../../static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../static/css/sticky-footer-navbar.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+  </script>
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-86150938-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+  
+  
+ <link rel="stylesheet" type="text/css" href="../../static/css/blog_post.css ">
+
+
+
+
+</head>
+<body>
+<nav class="navbar navbar-default" style="margin: 0px "> 
+  <div class="container-fluid">
+
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html"> Posts </a>
+  </div>
+  <div class="collapse navbar-collapse" id="myNavbar"> 
+    <ul class="nav navbar-nav">
+
+      <li><a href="../../resume">Resume</a></li>
+      <li><a href="../../resume">About</a></li>
+      
+    </ul>
+    
+    <ul class="nav navbar-nav navbar-right">
+      <li> <a href="https://github.com/ksajjan" target="_blank">
+      <img src="../../static/img/github.png" style="width: 30px; height=30px"> 
+      </a> </li>
+      <li> <a href="https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank">
+      <img src="../../static/img/LinkedIn.png" style="width: 30px; height=30px"> 
+      </a></li>
+      <li> <a href="https://twitter.com/sajjkum" target="_blank">
+      <img src="../../static/img/Twitter.png" style="width: 30px; height=30px"> 
+      </a></li>
+
+    </ul>
+  </div>
+  </div>
+</nav>
+
+
+
+	<div class="single_blog_post">
+		<h2 class="post_heading"> Advance NumPy Part-II  </h2>
+		<p class="post_description">
+			<p>This is the second post on Advance Numerical Python (NumPy). In this post we will talk about ufunc methods, sorting and structured array.let's start by importing numpy.</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">randn</span>
+</pre></div>
+
+
+<h3>Universal functions (ufunc):</h3>
+<p>From docs "A universal function (or ufunc for short) is a function that operates on ndarrays in an element-by-element fashion, supporting array broadcasting, type casting, and several other standard features. That is, a ufunc is a “vectorized” wrapper for a function that takes a fixed number of scalar inputs and produces a fixed number of scalar outputs.</p>
+<p>In Numpy, universal functions are instances of the numpy.ufunc class"</p>
+<h3>ufunc Instance Methods</h3>
+<p>Their are few NumPy's binary ufuncs special methods for performing certain kinds of special vectorized operations. Some of them are: </p>
+<ol>
+<li>
+<p><i> <strong>reduce()</strong> </i><br>
+ reduce takes a single array and aggregates its values, optionally along an axis, by performing a sequence of binary operation.<br>
+ For example, an alternate way to sum elements in an array is to use <b> <i> np.add.reduce() </i> </b></p>
+<p>arr= np.arange(20)
+arr</p>
+</li>
+</ol>
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
+       17, 18, 19])
+</pre></div>
+
+
+<p>Let's perform an addition:</p>
+<div class="codehilite"><pre><span></span>arr.sum()
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>190
+</pre></div>
+
+
+<p>Check:</p>
+<div class="codehilite"><pre><span></span>np.add.reduce(arr)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>190
+</pre></div>
+
+
+<p>2.<b><i> accumulate() </i> </b> <br>
+it produces an array of the same size with the intermediate accumulated values.</p>
+<div class="codehilite"><pre><span></span>np.add.accumulate(arr)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([  0,   1,   3,   6,  10,  15,  21,  28,  36,  45,  55,  66,  78,
+        91, 105, 120, 136, 153, 171, 190])
+</pre></div>
+
+
+<p>another example:</p>
+<div class="codehilite"><pre><span></span>np.add.accumulate(arr1)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([0, 1, 3, 6])
+</pre></div>
+
+
+<p>3.<b><i> outer() </i> </b> <br>
+it performs a pairwise cross-product between two arrays.</p>
+<div class="codehilite"><pre><span></span>arr1= np.arange(4)
+arr1
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([0, 1, 2, 3])
+</pre></div>
+
+
+<p>So</p>
+<div class="codehilite"><pre><span></span>np.multiply.outer(arr,arr1) # you can try different value
+of second argument and see the difference in result.
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[ 0,  0,  0,  0],
+       [ 0,  1,  2,  3],
+       [ 0,  2,  4,  6],
+       [ 0,  3,  6,  9],
+       [ 0,  4,  8, 12],
+       [ 0,  5, 10, 15],
+       [ 0,  6, 12, 18],
+       [ 0,  7, 14, 21],
+       [ 0,  8, 16, 24],
+       [ 0,  9, 18, 27],
+       [ 0, 10, 20, 30],
+       [ 0, 11, 22, 33],
+       [ 0, 12, 24, 36],
+       [ 0, 13, 26, 39],
+       [ 0, 14, 28, 42],
+       [ 0, 15, 30, 45],
+       [ 0, 16, 32, 48],
+       [ 0, 17, 34, 51],
+       [ 0, 18, 36, 54],
+       [ 0, 19, 38, 57]])
+</pre></div>
+
+
+<p>The output of <i> <strong>outer</strong> </i> will have a <strong>dimension that is the sum of the dimensions of the input.</strong></p>
+<div class="codehilite"><pre><span></span>result= np.subtract.outer(randn(3,4), randn(4))
+print result.shape
+print result
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>(3, 4, 4)
+[[[ -4.13051051e-01   1.04092440e+00   2.98847493e+00   3.27364074e-01]
+  [ -1.17842508e-01   1.33613294e+00   3.28368348e+00   6.22572617e-01]
+  [  6.09592054e-01   2.06356750e+00   4.01111804e+00   1.35000718e+00]
+  [ -1.21598150e+00   2.37993946e-01   2.18554448e+00  -4.75566377e-01]]
+
+ [[  4.15421397e-01   1.86939684e+00   3.81694738e+00   1.15583652e+00]
+  [ -2.65594289e+00  -1.20196744e+00   7.45583097e-01  -1.91552776e+00]
+  [ -2.91411002e+00  -1.46013457e+00   4.87415964e-01  -2.17369490e+00]
+  [ -1.02671631e+00   4.27259137e-01   2.37480968e+00  -2.86301185e-01]]
+
+ [[ -9.78589483e-01   4.75385964e-01   2.42293650e+00  -2.38174358e-01]
+  [ -7.41275465e-01   7.12699982e-01   2.66025052e+00  -8.60340601e-04]
+  [ -2.63662351e+00  -1.18264807e+00   7.64902472e-01  -1.89620839e+00]
+  [ -1.75669451e+00  -3.02719064e-01   1.64483147e+00  -1.01627939e+00]]]
+</pre></div>
+
+
+<p>4.<b><i> reduceat() </i> </b> <br>
+it performs a local reduce, in essence an array  groupby operation in which slices of the array are aggregated together.It accepts a sequence of “bin edges” which indicate how to split and aggregate the values:</p>
+<div class="codehilite"><pre><span></span>arr2= np.arange(12)
+arr2
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
+</pre></div>
+
+
+<p>Now</p>
+<div class="codehilite"><pre><span></span>np.add.reduceat(arr2,[0,5,8])
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([10, 18, 38])
+</pre></div>
+
+
+<p>The results are the reductions (here sums) performed over arr2[0:5], arr2[5:8] and arr2[8:].</p>
+<div class="codehilite"><pre><span></span>np.add.reduceat(arr2,[0,4,8,11])
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 6, 22, 27, 11])
+</pre></div>
+
+
+<p>In this case, sums are performed over arr2[0:4], arr2[4:8], arr2[8:11] and arr2[11:].</p>
+<h3>Custom ufuncs:</h3>
+<p>There are a couple of facilities for creating your own function. 
+<b> <i> np.frompyfunc </i> </b> accepts a Python function along with a specification for the number of inputs and outputs. Let's see an example for this </p>
+<p>First define a function let's call it add_elem.</p>
+<div class="codehilite"><pre><span></span>def add_elem(x,y):
+    return x+y
+</pre></div>
+
+
+<p>let's feed our newly created function to np.frompyfunc</p>
+<div class="codehilite"><pre><span></span>add_arr= np.frompyfunc(add_elem,2,1)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>&lt;ufunc &#39;add_elem (vectorized)&#39;&gt;
+</pre></div>
+
+
+<p>From docs (about numpy.frompyfunc ):</p>
+<div class="codehilite"><pre><span></span>numpy.frompyfunc(func, nin, nout) &lt;br&gt;
+    Takes an arbitrary Python function and returns a Numpy ufunc.
+
+Parameters: 
+    func : Python function object
+
+            An arbitrary Python function.
+
+    nin : int
+
+            The number of input arguments.
+
+    nout : int
+
+            The number of objects returned by func.
+</pre></div>
+
+
+<p>Now call our custom ufunc </p>
+<div class="codehilite"><pre><span></span>add_arr(np.arange(8), randn(8))
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([-0.6014613786566805, 1.894454043067947, 0.873415829705414,
+       5.287178163549635, 4.665605872908261, 5.890771105067648,
+       6.063906527348435, 4.756267572064051], dtype=object)
+</pre></div>
+
+
+<p><strong>(here notice dtype=object in the output)</strong></p>
+<p>Functions created using Frompyfinc always return <b> arrays of Python objects</b> which isn't very convenient. So there is an alternate for this which is <b> <i> numpy.vectorize()</i> </b>, which is a bit more sophisticated about type inference. </p>
+<p>Define our function using np.vectorize :</p>
+<div class="codehilite"><pre><span></span>add_arr1= np.vectorize(add_elem, otypes=[np.float64])
+</pre></div>
+
+
+<p>Check our function:</p>
+<div class="codehilite"><pre><span></span>add_arr1(np.arange(8), randn(8)) #check the dtype in both output
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 2.00642338,  0.96311945,  1.5726915 ,  3.95436983,  2.69372674,
+        4.48954831,  7.71851384,  6.68381484])
+</pre></div>
+
+
+<p><b> DrawBack of custom ufuncs </b> <br>
+these are very slow because they require a Python Function call to compute each elements.</p>
+<h3>Structured and Record Arrays</h3>
+<p>Until now the numpy array is a <i>homogeneous</i> data container. On the surface, this would appear to not allow you to represent heterogeneous or tabular-like data. <br>
+A <i> structured <i> array is an ndarry in which each element can be thought of as representing a struct in C or row in a SQL table with multiple named fields.</p>
+<div class="codehilite"><pre><span></span>dtype= [(&#39;x&#39;, np.float64), (&#39;y&#39;,np.int32)]
+
+arr3= np.array([(2.3,6),(3,-2)], dtype=dtype)
+print arr3
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([(2.3, 6), (3.0, -2)], 
+      dtype=[(&#39;x&#39;, &#39;&lt;f8&#39;), (&#39;y&#39;, &#39;&lt;i4&#39;)])
+</pre></div>
+
+
+<p>There are several ways to specify a structured dtype. One typical way is as a list of tuples with<i>(field_name, field_data_type)<i>. Now, the elements of the array are tuple-like objects whose elements can be accessed like a dictionary:</p>
+<div class="codehilite"><pre><span></span>print arr3[0]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>(2.3, 6)
+</pre></div>
+
+
+<p>Check:</p>
+<div class="codehilite"><pre><span></span>print arr3[0][&#39;y&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>6
+</pre></div>
+
+
+<p>and,</p>
+<div class="codehilite"><pre><span></span>arr3[0][&#39;x&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>2.2999999999999998
+</pre></div>
+
+
+<p>The field names are stored in the <i> dtype.names </i> attribute. On accessing a field on the structured array, a strided view on the data is returned.</p>
+<p>For x:</p>
+<div class="codehilite"><pre><span></span>arr3[&#39;x&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 2.3,  3. ])
+</pre></div>
+
+
+<p>For y:</p>
+<div class="codehilite"><pre><span></span>arr3[&#39;y&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 6, -2])
+</pre></div>
+
+
+<p><b> Nested dtypes and Multidimensional Fields </b>
+When specifying a structured dtype, you can additionally pass a shape(as an int or tuple).</p>
+<div class="codehilite"><pre><span></span>dtype1= [(&#39;x&#39;, np.int32, 3), (&#39;y&#39;, np.int32)]
+
+arr4= np.ones(4,dtype=dtype1)
+print arr4
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([([1, 1, 1], 1), ([1, 1, 1], 1), ([1, 1, 1], 1), ([1, 1, 1], 1)], 
+      dtype=[(&#39;x&#39;, &#39;&lt;i4&#39;, (3,)), (&#39;y&#39;, &#39;&lt;i4&#39;)])
+</pre></div>
+
+
+<p><strong><i> In this case, the x field now refers to an array of length three for each record. and field y refers to an array of length 1 or a single integer</i></strong></p>
+<div class="codehilite"><pre><span></span>arr4[0]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>([1, 1, 1], 1)
+</pre></div>
+
+
+<p>Check:</p>
+<div class="codehilite"><pre><span></span>arr4[0][&#39;x&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([1, 1, 1])
+</pre></div>
+
+
+<p>Check:</p>
+<div class="codehilite"><pre><span></span>arr4[0][&#39;y&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>1
+
+
+arr4[&#39;x&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[1, 1, 1],
+       [1, 1, 1],
+       [1, 1, 1],
+       [1, 1, 1]])
+</pre></div>
+
+
+<p>Check:</p>
+<div class="codehilite"><pre><span></span>arr4[&#39;y&#39;]
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([1, 1, 1, 1])
+</pre></div>
+
+
+<h3>Sorting</h3>
+<p>Basically sorting can be done with two types:
+1. Python's built-in sort() method- it is an <i>in-plcae</i> sort, means that the array contents are rearranged without producing a new array
+2. numpy.sort() method- it create a new, sorted copy of an array. <br>
+Lets see example of both</p>
+<div class="codehilite"><pre><span></span>arr5= randn(5)
+arr5
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 1.56312324, -1.2984947 ,  2.15808092,  0.09181684,  0.44818238])
+</pre></div>
+
+
+<p>Buit-in Sort()</p>
+<div class="codehilite"><pre><span></span>print arr5.sort() # we have to call the array to print the sorted values
+print arr5
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>None
+[-1.2984947   0.09181684  0.44818238  1.56312324  2.15808092]
+</pre></div>
+
+
+<p><strong>Sorting in multidimensional array</strong></p>
+<div class="codehilite"><pre><span></span>arr6= randn(3,4)
+arr6
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[ 0.35860128, -0.8384423 , -1.6795786 ,  0.31239183],
+       [ 0.41454569,  0.03815681, -0.57127612, -0.28904015],
+       [-0.48835359,  0.58665824, -0.61388025, -0.84957973]])
+</pre></div>
+
+
+<p>Sorting only columns:</p>
+<div class="codehilite"><pre><span></span>arr6[:,0].sort() # sort first column values in-place 
+arr6
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[-0.48835359, -0.8384423 , -1.6795786 ,  0.31239183],
+       [ 0.35860128,  0.03815681, -0.57127612, -0.28904015],
+       [ 0.41454569,  0.58665824, -0.61388025, -0.84957973]])
+</pre></div>
+
+
+<p>Raw-sorting:</p>
+<div class="codehilite"><pre><span></span>arr6[0,:].sort() # sort first row values in-place
+arr6
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[-1.6795786 , -0.8384423 , -0.48835359,  0.31239183],
+       [ 0.35860128,  0.03815681, -0.57127612, -0.28904015],
+       [ 0.41454569,  0.58665824, -0.61388025, -0.84957973]])
+</pre></div>
+
+
+<p>Check:</p>
+<div class="codehilite"><pre><span></span>arr7= randn(5)
+arr7
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 2.14457701,  0.63477678,  0.59464752,  2.42914111, -0.46264067])
+</pre></div>
+
+
+<p>Numpy Sorting</p>
+<div class="codehilite"><pre><span></span>np.sort(arr7)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([-0.46264067,  0.59464752,  0.63477678,  2.14457701,  2.42914111])
+</pre></div>
+
+
+<p>Here we don't have to call the array specifically np.sort() created a new array with sorted value and that is returned.</p>
+<p>Multidimensional array Sorting with numpy.sort</p>
+<div class="codehilite"><pre><span></span>arr8= randn(2,4)
+arr8
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[ 0.12966096,  0.10096747,  0.53117391, -0.92888992],
+       [-0.00552033,  0.85259994,  0.40965244, -0.35089807]])
+</pre></div>
+
+
+<p>Now:</p>
+<div class="codehilite"><pre><span></span>np.sort(arr8,axis=0) # sorting is done along the axis=0 (column wise)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[-0.00552033,  0.10096747,  0.40965244, -0.92888992],
+       [ 0.12966096,  0.85259994,  0.53117391, -0.35089807]])
+</pre></div>
+
+
+<p>Sorting along axis=1</p>
+<div class="codehilite"><pre><span></span>np.sort(arr8, axis=1) #sorting is done along axis 1 (row wise)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[-0.92888992,  0.10096747,  0.12966096,  0.53117391],
+       [-0.35089807, -0.00552033,  0.40965244,  0.85259994]])
+</pre></div>
+
+
+<p>To sorting in <b> Descending order </b> the trick for a list values , values[::-1] return a list in reverse order. The same is true for ndarrays.</p>
+<div class="codehilite"><pre><span></span>arr8.sort(axis=1) # first sorting a list
+arr8
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[-0.92888992,  0.10096747,  0.12966096,  0.53117391],
+       [-0.35089807, -0.00552033,  0.40965244,  0.85259994]])
+</pre></div>
+
+
+<p>Now Sorting in <strong>descending order</strong></p>
+<div class="codehilite"><pre><span></span><span class="s s-Atom">arr8</span><span class="p">[</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([[ 0.53117391,  0.12966096,  0.10096747, -0.92888992],
+       [ 0.85259994,  0.40965244, -0.00552033, -0.35089807]])
+</pre></div>
+
+
+<h3>Sorting with argsort() and lexsort()</h3>
+<p>argsort() :
+it return an array of index (let's called indexer) in which order the original array can be sorted.</p>
+<div class="codehilite"><pre><span></span>arr9= randn(5)
+arr9
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 1.45852206,  1.89598304,  0.28001503, -1.01477851,  1.32962551])
+</pre></div>
+
+
+<p>argsort() sorting:</p>
+<div class="codehilite"><pre><span></span>indexer= arr9.argsort()
+indexer
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([3, 2, 4, 0, 1])
+</pre></div>
+
+
+<p>Here it tells the index of data which will be placed in sorted array. <br>
+let's say </p>
+<p>arr10= np.sort(arr9)</p>
+<div class="codehilite"><pre><span></span>arr10= np.sort(arr9)
+arr10
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([-1.01477851,  0.28001503,  1.32962551,  1.45852206,  1.89598304])
+</pre></div>
+
+
+<p>so first value in arr10 (sorted arr9) is -1.4577 which is on 0th index, second value is -1.0486 which is on 4th index in arr9 and so on.<br>
+so that indexer tells us about the sorting order in which the data will sorted.</p>
+<p><b> <i>lexsort() </i> </b> is similar to argsort, but it performs an indirect <i>lexicographical </i> sort on multiple key arrays.</p>
+<p><b> Alternate Sort Algorithms </b> :
+various stable sorting alogrithm can be used with a 
+<i> (kind= " mergesort ") argument </i></p>
+<h3>Finding elements in a Sorted Array:-</h3>
+<p><b> <i>numpy.searchsorted() </i> </b> is used to performs a binary search, returning the location in the array where the value would need to be inserted to maintain sorting.</p>
+<div class="codehilite"><pre><span></span>arr11= np.array([0,1,22,4,42,33,64])
+arr11
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>array([ 0,  1, 22,  4, 42, 33, 64])
+</pre></div>
+
+
+<p>Check:</p>
+<div class="codehilite"><pre><span></span>arr11.searchsorted(33)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>4
+</pre></div>
+
+
+<p>So 33 will be on 4th place in sorted array. let's check where 41 would fit.</p>
+<div class="codehilite"><pre><span></span>arr11.searchsorted(41)
+</pre></div>
+
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span>6
+</pre></div>
+
+
+<p>so in sorted array 41 would be 6th place.</p>
+<h3>Performance Tips</h3>
+<p>Getting good performance out of code utilizing NumPy is often straightforward, as
+array operations typically replace otherwise comparatively extremely slow pure Python
+loops. Here is a brief list of some of the things to keep in mind: <br>
+• Convert Python loops and conditional logic to array operations and boolean array
+operations <br>
+• Use broadcasting whenever possible <br>
+• Avoid copying data using array views (slicing) <br>
+• Utilize ufuncs and ufunc methods<br></p>
+<p>More ufunc function can be checked here:
+<a href="https://docs.scipy.org/doc/numpy/reference/ufuncs.html#available-ufuncs">https://docs.scipy.org/doc/numpy/reference/ufuncs.html#available-ufuncs</a></p>
+<p>Time to time as I learn more about Numpy I will update this post. Got anything in mind about this post Hit "Email me".
+Thanks for Reading.</p>
+		</p>
+		<small class="post_date">Published On : 2016-12-17</small>
+	</div>
+
+
+
+
+<footer class="footer">
+      <div class="container">
+        <p class="text-muted"> </p>
+        Let's Talk!
+        Connect on <a href="https://twitter.com/sajjkum" target="_blank">Twitter</a> , <a href=""https://www.linkedin.com/in/sajjan-kumar-a38187a6" target="_blank"">LinkedIn </a>, or <a href="mailto:sajjankumar@gmail.com" target="_blank">Email me </a>.
+        
+      </div>
+</footer>
+
+</body>
+</html>
